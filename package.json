@@ -1,0 +1,1 @@
+{"description":"White Murmure — mixeur de sons d'ambiance. PWA FR/EN.","devDependencies":{"vite":"^6.3.5"},"name":"white-murmure","private":true,"scripts":{"build":"vite build","check":"node tools/check_sync.mjs","dev":"vite","preview":"vite preview"},"type":"module","version":"0.1.0"}
