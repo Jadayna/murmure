@@ -431,8 +431,8 @@ function openPaywall(highlight) {
     <button class="btn ghost" id="pwClose2" style="width:100%">${t('close')}</button>
     <!--
       TODO(STRIPE) — intégration paiement (à faire, AUCUNE clé dans ce repo) :
-      1. Créer les 3 produits dans Stripe (compte Axe C Studio) : pack_orage 4,99 $,
-         pack_boreale 4,99 $, lifetime 19,99 $ (paiements uniques, pas d'abonnement).
+      1. Créer les 3 produits dans Stripe (compte Axe C Studio) : pack_orage 2,99 $,
+         pack_boreale 2,99 $, lifetime 9,99 $ (paiements uniques, pas d'abonnement).
       2. Fonction serverless (ex. /api/stripe/checkout sur Vercel) : reçoit {key},
          crée une Checkout Session Stripe, renvoie l'URL.
       3. Ici : fetch POST → window.location = sessionUrl.

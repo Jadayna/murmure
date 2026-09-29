@@ -16,14 +16,14 @@ export const SOUNDS = [
   { id: 'grillons',          file: 'sounds/grillons.mp3',          icon: 'crickets', pack: null, fr: 'Grillons',          en: 'Crickets' },
   { id: 'bruit-blanc',       file: 'sounds/bruit-blanc.mp3',       icon: 'whitenoise', pack: null, fr: 'Bruit blanc pur',   en: 'Pure white noise' },
   { id: 'ventilateur',       file: 'sounds/ventilateur.mp3',       icon: 'fan', pack: null, fr: 'Ventilateur',       en: 'Fan' },
-  // ---- Pack « Orage » (6) — 4,99 $ ----
+  // ---- Pack « Orage » (6) — 2,99 $ ----
   { id: 'pluie-battante',    file: 'sounds/pluie-battante.mp3',    icon: 'rain-heavy', pack: 'orage', fr: 'Pluie battante',  en: 'Heavy rain' },
   { id: 'tonnerre-proche',   file: 'sounds/tonnerre-proche.mp3',   icon: 'thunder-near', pack: 'orage', fr: 'Tonnerre proche', en: 'Close thunder' },
   { id: 'pluie-sur-vitre',   file: 'sounds/pluie-sur-vitre.mp3',   icon: 'rain-glass', pack: 'orage', fr: 'Pluie sur vitre', en: 'Rain on glass' },
   { id: 'vent-tempete',      file: 'sounds/vent-tempete.mp3',      icon: 'wind-storm', pack: 'orage', fr: 'Vent de tempête', en: 'Storm wind' },
   { id: 'grele',             file: 'sounds/grele.mp3',             icon: 'hail', pack: 'orage', fr: 'Grêle',           en: 'Hail' },
   { id: 'ruisseau-en-crue',  file: 'sounds/ruisseau-en-crue.mp3',  icon: 'stream', pack: 'orage', fr: 'Ruisseau en crue', en: 'Rushing stream' },
-  // ---- Pack « Forêt boréale » (6) — 4,99 $ ----
+  // ---- Pack « Forêt boréale » (6) — 2,99 $ ----
   { id: 'huard',             file: 'sounds/huard.mp3',             icon: 'loon', pack: 'boreale', fr: 'Huard',              en: 'Loon' },
   { id: 'vent-pins',         file: 'sounds/vent-pins.mp3',         icon: 'pines', pack: 'boreale', fr: 'Vent dans les pins', en: 'Wind in the pines' },
   { id: 'ruisseau-forestier',file: 'sounds/ruisseau-forestier.mp3',icon: 'stream-forest', pack: 'boreale', fr: 'Ruisseau forestier', en: 'Forest stream' },
@@ -33,8 +33,8 @@ export const SOUNDS = [
 ];
 
 export const PACKS = {
-  orage:   { fr: 'Orage',          en: 'Storm',          price: '4,99 $', icon: 'thunder' },
-  boreale: { fr: 'Forêt boréale',  en: 'Boreal forest',  price: '4,99 $', icon: 'pines' },
+  orage:   { fr: 'Orage',          en: 'Storm',          price: '2,99 $', icon: 'thunder' },
+  boreale: { fr: 'Forêt boréale',  en: 'Boreal forest',  price: '2,99 $', icon: 'pines' },
 };
 
-export const LIFETIME_PRICE = '19,99 $';
+export const LIFETIME_PRICE = '9,99 $';
