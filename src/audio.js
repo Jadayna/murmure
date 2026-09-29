@@ -25,7 +25,12 @@ export class AudioEngine {
       this.master.gain.value = 1;
       this.master.connect(this.ctx.destination);
     }
-    if (this.ctx.state === 'suspended') this.ctx.resume();
+    if (this.ctx.state === 'suspended') {
+      // Sur mobile le contexte peut rester suspendu : on tente de le
+      // relancer (sans planter si le navigateur refuse hors geste).
+      try { const p = this.ctx.resume(); if (p && p.catch) p.catch(() => {}); }
+      catch { /* ignore */ }
+    }
     return this.ctx;
   }
 

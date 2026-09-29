@@ -12,6 +12,8 @@ let lang = getInitialLang();
 
 // État UI (source de vérité pour le mix courant) : id -> volume 0-100
 const active = new Map();
+// Pause générale (bouton Play/Pause) : true = mix en pause, volontaire.
+let userPaused = false;
 
 // Droits (stub — en attente de Stripe, voir TODO(STRIPE) plus bas)
 function getEntitlements() {
@@ -85,6 +87,8 @@ async function toggleSound(id) {
     engine.stopOne(id);
     active.delete(id);
     tile?.classList.remove('active');
+    if (active.size === 0) userPaused = false;
+    updatePPBtn();
     persistVolumes();
     return;
   }
@@ -99,13 +103,34 @@ async function toggleSound(id) {
   }
   if (res === true) {
     active.set(id, vol);
+    userPaused = false; // ajouter un son relance le mix s'il était en pause
     tile?.classList.add('active');
     const slider = $(`input[data-vol="${id}"]`);
     if (slider) { slider.value = vol; slider.disabled = false; }
     pendingVolumes.delete(id);
     persistVolumes();
     setupMediaSession();
+    updatePPBtn();
   }
+}
+
+// --- Bouton Play/Pause général -----------------------------------------------
+// Met tout le mix en pause (contexte suspendu) ou le relance, sans perdre
+// les sons actifs ni leurs volumes.
+function updatePPBtn() {
+  const b = $('#ppBtn');
+  if (!b) return;
+  const playing = active.size > 0 && !userPaused;
+  b.textContent = playing ? '⏸️' : '▶️';
+  b.setAttribute('aria-label', t('playPause'));
+  b.title = t('playPause');
+}
+
+function toggleMaster() {
+  if (active.size === 0) { toast(t('noActive')); return; }
+  if (userPaused) { engine.resume(); userPaused = false; }
+  else { engine.suspend(); userPaused = true; }
+  updatePPBtn();
 }
 
 function setupMediaSession() {
@@ -148,6 +173,7 @@ function render() {
       <div><h1>White Murmure</h1><p>${t('tagline')}</p></div>
     </div>
     <div class="controls">
+      <button class="pill" id="ppBtn" title="${t('playPause')}" aria-label="${t('playPause')}">▶️</button>
       <button class="pill" id="langBtn">${lang === 'fr' ? 'EN' : 'FR'}</button>
       <button class="pill" id="themeBtn" title="${t('theme')}">🌓</button>
     </div>
@@ -189,10 +215,12 @@ function render() {
   <footer>
     <div class="roadmap">🗺️ ${t('roadmap')}</div>
     <div>${t('footer')}</div>
-    <div style="margin-top:6px;opacity:.7">White Murmure v0.1.0 — prototype</div>
+    <div style="margin-top:6px;opacity:.7">White Murmure v0.1.1 — prototype</div>
   </footer>`;
 
   // Événements
+  $('#ppBtn').onclick = toggleMaster;
+  updatePPBtn();
   $('#langBtn').onclick = () => {
     lang = lang === 'fr' ? 'en' : 'fr';
     localStorage.setItem('wm_lang', lang);
@@ -262,7 +290,16 @@ function startTimerUI(minutes) {
       el.textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
     }
   };
-  engine.onTimerDone = () => { toast(t('timerDone')); renderTimer(); };
+  engine.onTimerDone = () => {
+    // Le minuteur a tout arrêté : on nettoie aussi l'état UI.
+    active.clear();
+    userPaused = false;
+    persistVolumes();
+    document.querySelectorAll('.tile.active').forEach(el => el.classList.remove('active'));
+    toast(t('timerDone'));
+    renderTimer();
+    updatePPBtn();
+  };
   renderTimer();
 }
 
@@ -341,6 +378,7 @@ function applyMix(mix) {
         $(`.tile[data-id="${id}"]`)?.classList.add('unavailable');
       }
     }
+    updatePPBtn();
     persistVolumes();
   };
   document.addEventListener('pointerdown', kick, { once: false });
@@ -406,6 +444,11 @@ function cycleTheme() {
 applyTheme();
 restoreVolumes();
 document.documentElement.lang = lang;
+
+// Filet de sécurité (surtout mobile) : si le contexte audio est resté
+// suspendu, n'importe quel toucher le relance. Inoffensif sinon.
+document.addEventListener('pointerdown', () => engine.ensureCtx(), { passive: true });
+
 render();
 
 // Mix partagé via #m=... ?
