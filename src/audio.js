@@ -2,6 +2,10 @@
 // Un GainNode par son + un master. Boucles seamless : les fichiers sont
 // pré-édités avec micro-fondu aux jonctions (voir tools/make_sounds.py),
 // donc un simple `loop = true` suffit côté lecture.
+// Normalisation : chaque son porte un `trim` (dB, mesuré au loudnorm,
+// cible -24 LUFS) appliqué comme gain — tous les sons sortent au même
+// niveau de base. Un limiteur protège le master quand on superpose
+// plusieurs sons.
 
 export class AudioEngine {
   constructor() {
@@ -23,7 +27,16 @@ export class AudioEngine {
       this.ctx = new AC();
       this.master = this.ctx.createGain();
       this.master.gain.value = 1;
-      this.master.connect(this.ctx.destination);
+      // Limiteur de sécurité : les sons normalisés (trim) peuvent
+      // s'additionner fort quand on en superpose plusieurs.
+      this.limiter = this.ctx.createDynamicsCompressor();
+      this.limiter.threshold.value = -6;
+      this.limiter.knee.value = 0;
+      this.limiter.ratio.value = 20;
+      this.limiter.attack.value = 0.003;
+      this.limiter.release.value = 0.25;
+      this.master.connect(this.limiter);
+      this.limiter.connect(this.ctx.destination);
     }
     if (this.ctx.state === 'suspended') {
       // Sur mobile le contexte peut rester suspendu : on tente de le
@@ -55,7 +68,7 @@ export class AudioEngine {
   isPlaying(id) { return this.voices.has(id); }
   isMissing(id) { return this.missing.has(id); }
 
-  async toggle(id, file, volume01) {
+  async toggle(id, file, volume01, trimDb = 0) {
     this.ensureCtx();
     if (this.isPlaying(id)) { this.stopOne(id); return false; }
     const ok = await this.loadSound(id, file);
@@ -64,10 +77,11 @@ export class AudioEngine {
     src.buffer = this.buffers.get(id);
     src.loop = true; // boucle seamless (fichier pré-édité)
     const g = this.ctx.createGain();
-    g.gain.value = volume01 * volume01; // courbe perceptuelle
+    const trimLin = Math.pow(10, trimDb / 20); // normalisation du volume
+    g.gain.value = volume01 * volume01 * trimLin; // courbe perceptuelle × trim
     src.connect(g); g.connect(this.master);
     src.start();
-    this.voices.set(id, { source: src, gain: g });
+    this.voices.set(id, { source: src, gain: g, trimLin });
     return true;
   }
 
@@ -81,7 +95,7 @@ export class AudioEngine {
 
   setVolume(id, volume01) {
     const v = this.voices.get(id);
-    if (v) v.gain.gain.setTargetAtTime(volume01 * volume01, this.ctx.currentTime, 0.05);
+    if (v) v.gain.gain.setTargetAtTime(volume01 * volume01 * (v.trimLin || 1), this.ctx.currentTime, 0.05);
   }
 
   activeVolumes() {

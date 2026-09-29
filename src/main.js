@@ -99,7 +99,7 @@ async function toggleSound(id) {
   starting.add(id);
   try {
     const vol = pendingVolumes.get(id) ?? Number($(`input[data-vol="${id}"]`)?.value || 70);
-    const res = await engine.toggle(id, s.file, vol / 100);
+    const res = await engine.toggle(id, s.file, vol / 100, s.trim || 0);
     if (res === 'missing') {
       tile?.classList.add('unavailable');
       const lr = tile?.querySelector('.lockrow');
@@ -393,7 +393,7 @@ function applyMix(mix) {
       const s = SOUNDS.find(x => x.id === id);
       if (!s || active.get(id) === undefined) continue;
       const slider = $(`input[data-vol="${id}"]`);
-      const res = await engine.toggle(id, s.file, (active.get(id) || 70) / 100);
+      const res = await engine.toggle(id, s.file, (active.get(id) || 70) / 100, s.trim || 0);
       if (res === true) {
         pendingVolumes.delete(id);
         $(`.tile[data-id="${id}"]`)?.classList.add('active');
