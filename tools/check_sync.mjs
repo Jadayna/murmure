@@ -9,7 +9,7 @@ let fail = false;
 const soundsSrc = readFileSync('src/sounds.js', 'utf8');
 const swSrc = readFileSync('public/sw.js', 'utf8');
 const fromSounds = [...soundsSrc.matchAll(/file:\s*'([^']+)'/g)].map(m => m[1]).sort();
-const fromSW = [...swSrc.matchAll(/'([^']+\.wav)'/g)].map(m => m[1]).sort();
+const fromSW = [...swSrc.matchAll(/'([^']+\.(?:wav|mp3|ogg))'/g)].map(m => m[1]).sort();
 const onlyA = fromSounds.filter(f => !fromSW.includes(f));
 const onlyB = fromSW.filter(f => !fromSounds.includes(f));
 if (onlyA.length || onlyB.length || fromSounds.length === 0) {

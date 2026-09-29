@@ -3,8 +3,6 @@ export const STRINGS = {
   fr: {
     tagline: 'Le mixeur de sons d\u2019ambiance, simple et honnête.',
     honest: 'Pas d\u2019abonnement. Pas de piège.',
-    soundsComing: '🔶 Prototype — les sons arrivent bientôt',
-    tempSounds: '🔶 Sons temporaires (placeholders)',
     freeSounds: 'Sons gratuits',
     packsTitle: 'Packs de sons',
     locked: 'Verrouillé',
@@ -48,8 +46,6 @@ export const STRINGS = {
   en: {
     tagline: 'The simple, honest ambient sound mixer.',
     honest: 'No subscription. No tricks.',
-    soundsComing: '🔶 Prototype — sounds coming soon',
-    tempSounds: '🔶 Temporary sounds (placeholders)',
     freeSounds: 'Free sounds',
     packsTitle: 'Sound packs',
     locked: 'Locked',

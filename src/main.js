@@ -153,7 +153,6 @@ function render() {
     </div>
   </header>
   <div class="honest">${t('honest')}</div>
-  <div class="badge" id="soundBadge">${t('soundsComing')}</div>
   <p class="hint">${t('tapToStart')}</p>
 
   <h2>${t('freeSounds')}</h2>
@@ -224,7 +223,6 @@ function render() {
 
   renderTimer();
   renderMixes();
-  refreshSoundBadge();
 }
 
 function renderTimer() {
@@ -346,19 +344,6 @@ function applyMix(mix) {
     persistVolumes();
   };
   document.addEventListener('pointerdown', kick, { once: false });
-}
-
-// --- Badge statut des sons -----------------------------------------------------
-async function refreshSoundBadge() {
-  const badge = $('#soundBadge');
-  if (!badge) return;
-  const free = SOUNDS.filter(s => !s.pack);
-  const results = await Promise.allSettled(free.map(s => fetch(s.file, { method: 'HEAD' })));
-  const missing = results.filter(r => r.status === 'rejected' ||
-    (r.value && !r.value.ok)).length;
-  // TODO : quand les vrais sons seront intégrés, ce badge passera à tempSounds
-  // si les fichiers portent encore le préfixe TEMP-.
-  badge.textContent = missing === 0 ? t('tempSounds') : t('soundsComing');
 }
 
 // --- Paywall (STUB — pas de vrai paiement) -------------------------------------
