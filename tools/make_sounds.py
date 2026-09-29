@@ -78,8 +78,9 @@ def impulses(n, rate_per_s, dur_ms=30, f0=3000, f1=6000):
     """Salve d'impulsions (gouttes, crépitements...)."""
     y = np.zeros(n)
     count = int(n / SR * rate_per_s)
+    maxL = int(SR * dur_ms / 1000 * 1.5) + 1
     for _ in range(count):
-        i = rng.integers(0, n - int(SR * dur_ms / 1000))
+        i = rng.integers(0, n - maxL)
         L = int(SR * dur_ms / 1000 * rng.uniform(0.5, 1.5))
         f = rng.uniform(f0, f1)
         tt = np.arange(L) / SR
@@ -90,8 +91,9 @@ def impulses(n, rate_per_s, dur_ms=30, f0=3000, f1=6000):
 
 def chirps(n, count, f0=3000, f1=5200, dur=0.15):
     y = np.zeros(n)
+    maxL = int(SR * dur * 1.3) + 1
     for _ in range(count):
-        i = rng.integers(0, n - int(SR * dur) - 1)
+        i = rng.integers(0, n - maxL)
         L = int(SR * dur * rng.uniform(0.7, 1.3))
         tt = np.arange(L) / SR
         sweep = f0 + (f1 - f0) * np.sin(np.pi * tt / (L / SR))
