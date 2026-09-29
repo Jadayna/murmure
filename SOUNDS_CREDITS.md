@@ -1,7 +1,7 @@
 # White Murmure — Crédits des sons
 
-Les 22 sons de l'app, intégrés le 2026-09-29. Licences vérifiées page par page
-au téléchargement : **21 × CC0 1.0 Universal** (domaine public, utilisation
+Les 46 sons de l'app, intégrés le 2026-09-28/29. Licences vérifiées page par page
+au téléchargement : **45 × CC0 1.0 Universal** (domaine public, utilisation
 commerciale autorisée sans attribution) + **1 × domaine public du gouvernement
 fédéral américain** (US National Park Service).
 
@@ -53,3 +53,47 @@ fédéral américain** (US National Park Service).
 - Les fichiers ont été renommés par slug (`public/sounds/<slug>.mp3`) ;
   la correspondance avec les noms Freesound d'origine figure dans
   `~/workspace/murmure/sounds/SHORTLIST_SONS.md`.
+
+## Pack « Jardin japonais » (vague 2, 2026-09-29)
+
+| Slug | Titre d'origine | Auteur | Source | Licence |
+|---|---|---|---|---|
+| fontaine-bambou | 29011_waterfall.wav | dpaddytech | https://freesound.org/people/dpaddytech/sounds/660413/ | CC0 |
+| carillon-vent | Windchime.wav | Chris W | https://freesound.org/people/Chris%20W/sounds/432813/ | CC0 |
+| ruisseau-zen | Stream 2 | richwise | https://freesound.org/people/richwise/sounds/528428/ | CC0 |
+| cigales | Cicada during summer in South of France (1 hour) | felix.blume | https://freesound.org/people/felix.blume/sounds/536915/ | CC0 |
+| vent-bambous | Amb - Bamboos creaking and rustling with the wind | nyoz | https://freesound.org/people/nyoz/sounds/615748/ | CC0 |
+| bol-chantant | Singing Bowl, long without reverb | hollandm | https://freesound.org/people/hollandm/sounds/573805/ | CC0 |
+
+## Pack « Côte sauvage » (vague 2, 2026-09-29)
+
+| Slug | Titre d'origine | Auteur | Source | Licence |
+|---|---|---|---|---|
+| vagues-rochers | Sea waves against rocks | emainta | https://freesound.org/people/emainta/sounds/648860/ | CC0 |
+| vent-cotier | Strong wind and sea | bruno.auzet | https://freesound.org/people/bruno.auzet/sounds/706465/ | CC0 |
+| mouettes | Seagulls ambience Lofoten Svolvær | Lydmakeren | https://freesound.org/people/Lydmakeren/sounds/510912/ | CC0 |
+| corne-brume | Ocean and fog horn | shepardr | https://freesound.org/people/shepardr/sounds/128093/ | CC0 |
+| galets | stoney_stormyc_nov12 | MacFerret_20 | https://freesound.org/people/MacFerret_20/sounds/170434/ | CC0 |
+| pluie-fine | Light rain | jankooiker | https://freesound.org/people/jankooiker/sounds/237935/ | CC0 |
+
+## Pack « Nuit au camp » (vague 2, 2026-09-29)
+
+| Slug | Titre d'origine | Auteur | Source | Licence |
+|---|---|---|---|---|
+| feu-de-camp | Crackling campfire | aerror | https://freesound.org/people/aerror/sounds/767107/ | CC0 |
+| hibou | Tawny owl hooting | Patrick_Corra | https://freesound.org/people/Patrick_Corra/sounds/745208/ | CC0 |
+| pluie-sur-tente | Rain on tent 01 | pbimal | https://freesound.org/people/pbimal/sounds/646768/ | CC0 |
+| vent-feuilles | Wind blowing leaves in tree | naturenotesuk | https://freesound.org/people/naturenotesuk/sounds/442824/ | CC0 |
+| bois-craque | Walking in the woods crunching sticks underfoot | f-r-a-g-i-l-e | https://freesound.org/people/f-r-a-g-i-l-e/sounds/506272/ | CC0 |
+| loup | Solitary wolf howl, very clear (Cooper Creek) | betchkal | https://freesound.org/people/betchkal/sounds/500646/ | CC0 |
+
+## Pack « Pluie tropicale » (vague 2, 2026-09-29)
+
+| Slug | Titre d'origine | Auteur | Source | Licence |
+|---|---|---|---|---|
+| averse-tropicale | Tropical storm, heavy rain, thunderstorm | Solar01 | https://freesound.org/people/Solar01/sounds/671587/ | CC0 |
+| grenouilles | Toads and frogs during the night on the edge of the river | felix.blume | https://freesound.org/people/felix.blume/sounds/420919/ | CC0 |
+| oiseaux-tropicaux | Early morning with parrots and other birds | saralana | https://freesound.org/people/saralana/sounds/559220/ | CC0 |
+| ruisseau-jungle | Thailand Phangan jungle waterfall 2 | Archos | https://freesound.org/people/Archos/sounds/468241/ | CC0 |
+| vent-palmiers | Wind through palm trees | klangfabrik | https://freesound.org/people/klangfabrik/sounds/423800/ | CC0 |
+| cascade | Waterfall | Tom_Kaszuba | https://freesound.org/people/Tom_Kaszuba/sounds/656632/ | CC0 |

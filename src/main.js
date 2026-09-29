@@ -36,7 +36,7 @@ function packUnlocked(pack) {
 // DEV ONLY : ?dev=unlock débloque tout en local pour tester le paywall.
 // À retirer/supprimer avant le lancement public.
 if (new URLSearchParams(location.search).get('dev') === 'unlock') {
-  saveEntitlements({ packs: ['orage', 'boreale'], lifetime: true });
+  saveEntitlements({ packs: Object.keys(PACKS), lifetime: true });
   setTimeout(() => toast(t('devUnlocked')), 600);
 }
 
@@ -205,7 +205,7 @@ function render() {
       <div class="pack-card">
         <div class="pinfo"><div class="medal sm">${ICONS[PACKS[p].icon]}</div>
           <div><div class="pname">${PACKS[p][lang]} ${ent.lifetime || ent.packs.includes(p) ? `<span class="checkbadge">${ICONS.check}</span>` : ''}</div>
-          <div class="pdesc">${t(p === 'orage' ? 'packOrageDesc' : 'packBorealeDesc')} — ${PACKS[p].price}</div></div>
+          <div class="pdesc">${t('pack' + p[0].toUpperCase() + p.slice(1) + 'Desc')} — ${PACKS[p].price}</div></div>
         </div>
         <button class="btn small" data-unlock="${p}">${t('unlock')}</button>
       </div>`).join('')}
@@ -425,14 +425,14 @@ function openPaywall(highlight) {
     <button class="iconbtn sheet-close" id="pwClose" aria-label="${t('close')}">${ICONS.close}</button>
     <h2>${t('paywallTitle')}</h2>
     <p style="color:var(--muted)">${t('paywallSub')}</p>
-    ${card(ICONS.thunder, PACKS.orage[lang], t('packOrageDesc'), PACKS.orage.price, '', 'pack:orage')}
-    ${card(ICONS.pines, PACKS.boreale[lang], t('packBorealeDesc'), PACKS.boreale.price, '', 'pack:boreale')}
+    ${Object.keys(PACKS).map(p => card(ICONS[PACKS[p].icon], PACKS[p][lang], t('pack' + p[0].toUpperCase() + p.slice(1) + 'Desc'), PACKS[p].price, '', 'pack:' + p)).join('')}
     ${card(ICONS.infinity, t('lifetime'), t('lifetimeDesc'), LIFETIME_PRICE, t('bestValue'), 'lifetime')}
     <button class="btn ghost" id="pwClose2" style="width:100%">${t('close')}</button>
     <!--
       TODO(STRIPE) — intégration paiement (à faire, AUCUNE clé dans ce repo) :
-      1. Créer les 3 produits dans Stripe (compte Axe C Studio) : pack_orage 2,99 $,
-         pack_boreale 2,99 $, lifetime 9,99 $ (paiements uniques, pas d'abonnement).
+      1. Créer les 7 produits dans Stripe (compte Axe C Studio) : pack_orage 2,99 $,
+         pack_boreale 2,99 $, pack_japon 2,99 $, pack_cote 2,99 $, pack_camp 2,99 $,
+         pack_tropical 2,99 $, lifetime 9,99 $ (paiements uniques, pas d'abonnement).
       2. Fonction serverless (ex. /api/stripe/checkout sur Vercel) : reçoit {key},
          crée une Checkout Session Stripe, renvoie l'URL.
       3. Ici : fetch POST → window.location = sessionUrl.
