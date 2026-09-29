@@ -2,6 +2,7 @@ import './style.css';
 import { SOUNDS, PACKS, LIFETIME_PRICE } from './sounds.js';
 import { STRINGS, getInitialLang } from './i18n.js';
 import { AudioEngine } from './audio.js';
+import { ICONS } from './icons.js';
 
 // ---------------------------------------------------------------------------
 // White Murmure — PWA mixeur de sons d'ambiance (V1 prototype)
@@ -121,9 +122,10 @@ function updatePPBtn() {
   const b = $('#ppBtn');
   if (!b) return;
   const playing = active.size > 0 && !userPaused;
-  b.textContent = playing ? '⏸️' : '▶️';
+  b.innerHTML = playing ? ICONS.pause : ICONS.play;
   b.setAttribute('aria-label', t('playPause'));
   b.title = t('playPause');
+  b.classList.toggle('is-playing', playing);
 }
 
 function toggleMaster() {
@@ -154,8 +156,11 @@ function tileHTML(s) {
   return `
   <div class="tile ${isActive ? 'active' : ''} ${locked ? 'locked' : ''}" data-id="${s.id}" role="button" tabindex="0"
        aria-label="${s[lang]}">
-    <div><div class="icon">${s.icon}</div><div class="name">${s[lang]}</div></div>
-    <div class="lockrow">${locked ? '🔒 ' + t('locked') : ''}</div>
+    <div class="tile-top">
+      <div class="medal">${ICONS[s.icon] || ''}${locked ? `<span class="lockbadge">${ICONS.lock}</span>` : ''}</div>
+      <div class="name">${s[lang]}</div>
+    </div>
+    ${locked ? `<div class="lockrow">${t('locked')}</div>` : ''}
     <input type="range" min="0" max="100" value="${vol}" data-vol="${s.id}"
            aria-label="${t('volume')} — ${s[lang]}" ${isActive || !locked ? '' : 'disabled'} />
   </div>`;
@@ -169,13 +174,13 @@ function render() {
   $('#app').innerHTML = `
   <header class="top">
     <div class="brand">
-      <div class="logo">🌊</div>
+      <div class="logo">${ICONS.waves}</div>
       <div><h1>White Murmure</h1><p>${t('tagline')}</p></div>
     </div>
     <div class="controls">
-      <button class="pill" id="ppBtn" title="${t('playPause')}" aria-label="${t('playPause')}">▶️</button>
+      <button class="iconbtn accent" id="ppBtn" title="${t('playPause')}" aria-label="${t('playPause')}">${ICONS.play}</button>
       <button class="pill" id="langBtn">${lang === 'fr' ? 'EN' : 'FR'}</button>
-      <button class="pill" id="themeBtn" title="${t('theme')}">🌓</button>
+      <button class="iconbtn" id="themeBtn" title="${t('theme')}" aria-label="${t('theme')}">${ICONS.theme}</button>
     </div>
   </header>
   <div class="honest">${t('honest')}</div>
@@ -188,8 +193,8 @@ function render() {
   <div id="packCards">
     ${packs.map(p => `
       <div class="pack-card">
-        <div class="pinfo"><div class="picon">${PACKS[p].icon}</div>
-          <div><div class="pname">${PACKS[p][lang]} ${ent.lifetime || ent.packs.includes(p) ? '✅' : ''}</div>
+        <div class="pinfo"><div class="medal sm">${ICONS[PACKS[p].icon]}</div>
+          <div><div class="pname">${PACKS[p][lang]} ${ent.lifetime || ent.packs.includes(p) ? `<span class="checkbadge">${ICONS.check}</span>` : ''}</div>
           <div class="pdesc">${t(p === 'orage' ? 'packOrageDesc' : 'packBorealeDesc')} — ${PACKS[p].price}</div></div>
         </div>
         <button class="btn small" data-unlock="${p}">${t('unlock')}</button>
@@ -213,7 +218,7 @@ function render() {
        Ne s'affiche que si l'utilisateur n'a rien acheté (cf. adsRemoved()). -->`}
 
   <footer>
-    <div class="roadmap">🗺️ ${t('roadmap')}</div>
+    <div class="roadmap">${t('roadmap')}</div>
     <div>${t('footer')}</div>
     <div style="margin-top:6px;opacity:.7">White Murmure v0.1.1 — prototype</div>
   </footer>`;
@@ -257,7 +262,7 @@ function renderTimer() {
   const box = $('#timerBox');
   if (engine.timerRunning) {
     box.innerHTML = `
-      <div class="row"><span>⏳ <span class="count" id="countdown">--:--</span></span>
+      <div class="row"><span class="tcount">${ICONS.clock}<span class="count" id="countdown">--:--</span></span>
       <button class="btn small ghost" id="timerStopBtn">${t('timerStop')}</button></div>`;
     $('#timerStopBtn').onclick = () => { engine.clearTimer(); renderTimer(); };
     return;
@@ -314,7 +319,7 @@ function renderMixes() {
   list.innerHTML = mixes.length === 0
     ? `<p class="hint">—</p>`
     : mixes.map((m, i) => `
-      <div class="mixitem"><div class="mname">🎛️ ${m.name}</div>
+      <div class="mixitem"><div class="mname">${m.name}</div>
       <div class="mactions">
         <button class="linkbtn" data-load="${i}">${t('load')}</button>
         <button class="linkbtn danger" data-del="${i}">${t('del')}</button>
@@ -388,20 +393,21 @@ function applyMix(mix) {
 function openPaywall(highlight) {
   const ov = document.createElement('div');
   ov.className = 'overlay';
-  const card = (title, desc, price, tag, key) => `
+  const card = (icon, title, desc, price, tag, key) => `
     <div class="offer ${tag ? 'hero' : ''}">
-      <div class="otitle"><span>${title}</span>${tag ? `<span class="tag">${tag}</span>` : ''}</div>
+      <div class="otitle"><span class="otitle-l"><span class="medal sm">${icon}</span><span>${title}</span></span>${tag ? `<span class="tag">${tag}</span>` : ''}</div>
       <div class="odesc">${desc} — <strong>${price}</strong></div>
       <button class="btn" data-buy="${key}">${t('choose')} · ${price}</button>
     </div>`;
   ov.innerHTML = `
   <div class="sheet" role="dialog" aria-modal="true">
+    <button class="iconbtn sheet-close" id="pwClose" aria-label="${t('close')}">${ICONS.close}</button>
     <h2>${t('paywallTitle')}</h2>
     <p style="color:var(--muted)">${t('paywallSub')}</p>
-    ${card(PACKS.orage.icon + ' ' + PACKS.orage[lang], t('packOrageDesc'), PACKS.orage.price, '', 'pack:orage')}
-    ${card(PACKS.boreale.icon + ' ' + PACKS.boreale[lang], t('packBorealeDesc'), PACKS.boreale.price, '', 'pack:boreale')}
-    ${card('♾️ ' + t('lifetime'), t('lifetimeDesc'), LIFETIME_PRICE, t('bestValue'), 'lifetime')}
-    <button class="btn ghost" id="pwClose" style="width:100%">${t('close')}</button>
+    ${card(ICONS.thunder, PACKS.orage[lang], t('packOrageDesc'), PACKS.orage.price, '', 'pack:orage')}
+    ${card(ICONS.pines, PACKS.boreale[lang], t('packBorealeDesc'), PACKS.boreale.price, '', 'pack:boreale')}
+    ${card(ICONS.infinity, t('lifetime'), t('lifetimeDesc'), LIFETIME_PRICE, t('bestValue'), 'lifetime')}
+    <button class="btn ghost" id="pwClose2" style="width:100%">${t('close')}</button>
     <!--
       TODO(STRIPE) — intégration paiement (à faire, AUCUNE clé dans ce repo) :
       1. Créer les 3 produits dans Stripe (compte Axe C Studio) : pack_orage 4,99 $,
@@ -416,6 +422,7 @@ function openPaywall(highlight) {
   </div>`;
   ov.addEventListener('click', (e) => { if (e.target === ov) ov.remove(); });
   ov.querySelector('#pwClose').onclick = () => ov.remove();
+  ov.querySelector('#pwClose2').onclick = () => ov.remove();
   ov.querySelectorAll('[data-buy]').forEach(b => {
     b.onclick = () => {
       // STUB : aucun appel réseau, aucun paiement réel.
