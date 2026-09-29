@@ -15,6 +15,8 @@ let lang = getInitialLang();
 const active = new Map();
 // Pause générale (bouton Play/Pause) : true = mix en pause, volontaire.
 let userPaused = false;
+// Démarrages en cours (anti double-tap pendant le chargement du son).
+const starting = new Set();
 
 // Droits (stub — en attente de Stripe, voir TODO(STRIPE) plus bas)
 function getEntitlements() {
@@ -93,25 +95,31 @@ async function toggleSound(id) {
     persistVolumes();
     return;
   }
-  const vol = pendingVolumes.get(id) ?? Number($(`input[data-vol="${id}"]`)?.value || 70);
-  const res = await engine.toggle(id, s.file, vol / 100);
-  if (res === 'missing') {
-    tile?.classList.add('unavailable');
-    const lr = tile?.querySelector('.lockrow');
-    if (lr) lr.textContent = t('soon');
-    toast(t('soon'));
-    return;
-  }
-  if (res === true) {
-    active.set(id, vol);
-    userPaused = false; // ajouter un son relance le mix s'il était en pause
-    tile?.classList.add('active');
-    const slider = $(`input[data-vol="${id}"]`);
-    if (slider) { slider.value = vol; slider.disabled = false; }
-    pendingVolumes.delete(id);
-    persistVolumes();
-    setupMediaSession();
-    updatePPBtn();
+  if (starting.has(id)) return; // démarrage déjà en cours
+  starting.add(id);
+  try {
+    const vol = pendingVolumes.get(id) ?? Number($(`input[data-vol="${id}"]`)?.value || 70);
+    const res = await engine.toggle(id, s.file, vol / 100);
+    if (res === 'missing') {
+      tile?.classList.add('unavailable');
+      const lr = tile?.querySelector('.lockrow');
+      if (lr) lr.textContent = t('soon');
+      toast(t('soon'));
+      return;
+    }
+    if (res === true) {
+      active.set(id, vol);
+      userPaused = false; // ajouter un son relance le mix s'il était en pause
+      tile?.classList.add('active');
+      const slider = $(`input[data-vol="${id}"]`);
+      if (slider) { slider.value = vol; slider.disabled = false; }
+      pendingVolumes.delete(id);
+      persistVolumes();
+      setupMediaSession();
+      updatePPBtn();
+    }
+  } finally {
+    starting.delete(id);
   }
 }
 
@@ -178,13 +186,15 @@ function render() {
       <div><h1>White Murmure</h1><p>${t('tagline')}</p></div>
     </div>
     <div class="controls">
-      <button class="iconbtn accent" id="ppBtn" title="${t('playPause')}" aria-label="${t('playPause')}">${ICONS.play}</button>
       <button class="pill" id="langBtn">${lang === 'fr' ? 'EN' : 'FR'}</button>
       <button class="iconbtn" id="themeBtn" title="${t('theme')}" aria-label="${t('theme')}">${ICONS.theme}</button>
     </div>
   </header>
   <div class="honest">${t('honest')}</div>
   <p class="hint">${t('tapToStart')}</p>
+  <div class="master-wrap">
+    <button class="masterbtn" id="ppBtn" title="${t('playPause')}" aria-label="${t('playPause')}">${ICONS.play}</button>
+  </div>
 
   <h2>${t('freeSounds')}</h2>
   <div class="grid" id="freeGrid">${free.map(tileHTML).join('')}</div>
@@ -220,7 +230,7 @@ function render() {
   <footer>
     <div class="roadmap">${t('roadmap')}</div>
     <div>${t('footer')}</div>
-    <div style="margin-top:6px;opacity:.7">White Murmure v0.1.1 — prototype</div>
+    <div style="margin-top:6px;opacity:.7">White Murmure v0.2.1 — prototype</div>
   </footer>`;
 
   // Événements
@@ -239,11 +249,22 @@ function render() {
     const slider = tile.querySelector('input[type="range"]');
     slider.addEventListener('pointerdown', e => e.stopPropagation());
     slider.addEventListener('click', e => e.stopPropagation());
+    // La barre de volume DÉCLENCHE le son : on = ça démarre, 0 = ça s'éteint.
     slider.addEventListener('input', () => {
-      if (!active.has(id)) return;
-      active.set(id, Number(slider.value));
-      engine.setVolume(id, Number(slider.value) / 100);
-      persistVolumes();
+      const v = Number(slider.value);
+      if (v === 0) {
+        pendingVolumes.delete(id);
+        if (active.has(id)) toggleSound(id); // éteint le son
+        return;
+      }
+      if (active.has(id)) {
+        active.set(id, v);
+        engine.setVolume(id, v / 100);
+        persistVolumes();
+        return;
+      }
+      pendingVolumes.set(id, v);
+      toggleSound(id); // démarre le son au volume glissé
     });
     const go = (e) => { e.preventDefault(); toggleSound(id); };
     tile.addEventListener('click', go);

@@ -60,6 +60,18 @@ header.top { display: flex; align-items: center; justify-content: space-between;
 .honest { color: var(--accent); font-weight: 700; font-size: 14px; margin: 16px 0 4px; }
 .hint { text-align: center; color: var(--muted); font-size: 14px; margin: 6px 0 0; }
 
+/* Bouton Play/Pause général, centré au-dessus des sons */
+.master-wrap { display: flex; justify-content: center; margin: 20px 0 6px; }
+.masterbtn {
+  width: 72px; height: 72px; border-radius: 50%; border: none;
+  background: var(--accent); color: var(--accent-ink);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; box-shadow: var(--shadow), 0 6px 22px rgba(47, 125, 140, .35);
+  transition: transform .12s;
+}
+.masterbtn:active { transform: scale(.94); }
+.masterbtn svg { width: 30px; height: 30px; }
+
 h2 {
   font-size: 13px; text-transform: uppercase; letter-spacing: 1.6px;
   color: var(--muted); margin: 32px 0 14px; font-weight: 800;
