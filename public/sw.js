@@ -57,12 +57,13 @@ const PACK_SOUNDS = [
 ];
 
 const CACHE = 'white-murmure-v3';
+// Chemins relatifs au SW : OK à '/' comme en sous-chemin (ex. /whitemurmure/app/).
 const CORE = [
-  '/',
-  '/index.html',
-  '/manifest.webmanifest',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
+  './',
+  './index.html',
+  './manifest.webmanifest',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
 ];
 
 self.addEventListener('install', (e) => {
