@@ -41,6 +41,17 @@ if (new URLSearchParams(location.search).get('dev') === 'unlock') {
 }
 
 const t = (k) => (STRINGS[lang] && STRINGS[lang][k]) || STRINGS.fr[k] || k;
+
+// Visuels des packs — même langage que le site vitrine.
+const PACK_ART = {
+  orage: '<svg viewBox="0 0 300 120"><rect width="300" height="120" fill="#1c3038"/><path d="M40 70 L90 70 L70 100 L110 100 L60 130 L50 95 L75 95 Z" fill="#7cc3d3" opacity=".9" transform="translate(20,-20)"/><circle cx="230" cy="35" r="22" fill="#242e3d"/><circle cx="205" cy="42" r="16" fill="#242e3d"/></svg>',
+  boreale: '<svg viewBox="0 0 300 120"><rect width="300" height="120" fill="#14231f"/><path d="M60 110 L60 60 L45 60 L60 35 L52 35 L68 10 L84 35 L76 35 L91 60 L76 60 L76 110 Z" fill="#2f7d8c"/><path d="M150 110 L150 55 L132 55 L150 28 L140 28 L160 5 L180 28 L170 28 L188 55 L170 55 L170 110 Z" fill="#7cc3d3" opacity=".75"/><path d="M235 110 L235 65 L220 65 L235 40 L227 40 L243 18 L259 40 L251 40 L266 65 L251 65 L251 110 Z" fill="#2f7d8c" opacity=".6"/></svg>',
+  japon: '<svg viewBox="0 0 300 120"><rect width="300" height="120" fill="#1c3038"/><circle cx="150" cy="60" r="30" fill="#7cc3d3" opacity=".85"/><rect x="60" y="20" width="14" height="80" fill="#2f7d8c"/><rect x="226" y="20" width="14" height="80" fill="#2f7d8c"/><rect x="52" y="14" width="196" height="12" fill="#2f7d8c"/></svg>',
+  cote: '<svg viewBox="0 0 300 120"><rect width="300" height="120" fill="#101d26"/><path d="M0 70 q25-18 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 V120 H0 Z" fill="#2f7d8c" opacity=".8"/><path d="M0 85 q25-18 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 V120 H0 Z" fill="#7cc3d3" opacity=".5"/><path d="M210 40 l14 0 l-7 12 z M240 30 l10 0 l-5 9 z" fill="#edeae3" opacity=".8"/></svg>',
+  camp: '<svg viewBox="0 0 300 120"><rect width="300" height="120" fill="#141a26"/><circle cx="248" cy="26" r="14" fill="#edeae3" opacity=".85"/><path d="M150 95 L120 60 L180 60 Z" fill="#2f7d8c"/><path d="M150 78 c6-10 2-16 -4-22 c-2 8 -8 10 -6 20 c1 6 8 6 10 2z" fill="#7cc3d3"/><circle cx="60" cy="30" r="2" fill="#edeae3"/><circle cx="100" cy="55" r="1.6" fill="#edeae3"/><circle cx="200" cy="70" r="2" fill="#edeae3"/></svg>',
+  tropical: '<svg viewBox="0 0 300 120"><rect width="300" height="120" fill="#12261f"/><path d="M150 110 C150 70 130 55 90 50 C130 45 145 60 150 30 C155 60 170 45 210 50 C170 55 150 70 150 110" fill="#2f7d8c"/><path d="M150 110 C150 80 140 68 115 62 C140 58 148 68 150 45 C152 68 160 58 185 62 C160 68 150 80 150 110" fill="#7cc3d3" opacity=".7"/><path d="M40 20 l-6 14 M70 14 l-6 14 M250 20 l-6 14" stroke="#7cc3d3" stroke-width="4" stroke-linecap="round" opacity=".6"/></svg>',
+  lifetime: '<svg viewBox="0 0 300 120"><rect width="300" height="120" fill="#1c3038"/><path d="M110 60 c0-16 14-26 26-26 c14 0 20 10 14 20 c-8 12 -28 12 -40 6 c-12 -6 -32 -6 -40 6 c-6 10 0 20 14 20 c12 0 26-10 26-26z" fill="none" stroke="#7cc3d3" stroke-width="7" stroke-linecap="round" transform="translate(44,0)"/></svg>',
+};
 const $ = (sel, el = document) => el.querySelector(sel);
 
 // --- Persistance des volumes ------------------------------------------------
@@ -134,6 +145,18 @@ function updatePPBtn() {
   b.setAttribute('aria-label', t('playPause'));
   b.title = t('playPause');
   b.classList.toggle('is-playing', playing);
+  const np = $('#nowPlaying');
+  if (np) {
+    if (active.size === 0) { np.style.display = 'none'; }
+    else {
+      np.style.display = '';
+      const names = [...active.keys()].map(id => {
+        const s = SOUNDS.find(x => x.id === id);
+        return s ? s[lang] : id;
+      });
+      np.innerHTML = '<span class="np-dot"></span><span>' + t('nowPlaying') + ' : ' + names.join(' + ') + '</span>';
+    }
+  }
 }
 
 function toggleMaster() {
@@ -180,6 +203,7 @@ function render() {
   const ent = getEntitlements();
 
   $('#app').innerHTML = `
+  <canvas id="ambient" aria-hidden="true"></canvas>
   <header class="top">
     <div class="brand">
       <div class="logo">${ICONS.waves}</div>
@@ -195,6 +219,7 @@ function render() {
   <div class="master-wrap">
     <button class="masterbtn" id="ppBtn" title="${t('playPause')}" aria-label="${t('playPause')}">${ICONS.play}</button>
   </div>
+  <div class="nowplaying" id="nowPlaying" style="display:none"></div>
 
   <h2>${t('freeSounds')}</h2>
   <div class="grid" id="freeGrid">${free.map(tileHTML).join('')}</div>
@@ -203,7 +228,7 @@ function render() {
   <div id="packCards">
     ${packs.map(p => `
       <div class="pack-card">
-        <div class="pinfo"><div class="medal sm">${ICONS[PACKS[p].icon]}</div>
+        <div class="pinfo"><span class="pack-art">${PACK_ART[p] || ''}</span>
           <div><div class="pname">${PACKS[p][lang]} ${ent.lifetime || ent.packs.includes(p) ? `<span class="checkbadge">${ICONS.check}</span>` : ''}</div>
           <div class="pdesc">${t('pack' + p[0].toUpperCase() + p.slice(1) + 'Desc')} — ${PACKS[p].price}</div></div>
         </div>
@@ -230,7 +255,7 @@ function render() {
   <footer>
     <div class="roadmap">${t('roadmap')}</div>
     <div>${t('footer')}</div>
-    <div style="margin-top:6px;opacity:.7">White Murmure v0.2.1 — prototype</div>
+    <div style="margin-top:6px;opacity:.7">White Murmure v0.4.0</div>
   </footer>`;
 
   // Événements
@@ -414,19 +439,22 @@ function applyMix(mix) {
 function openPaywall(highlight) {
   const ov = document.createElement('div');
   ov.className = 'overlay';
-  const card = (icon, title, desc, price, tag, key) => `
+  const card = (art, icon, title, desc, price, tag, key) => `
     <div class="offer ${tag ? 'hero' : ''}">
-      <div class="otitle"><span class="otitle-l"><span class="medal sm">${icon}</span><span>${title}</span></span>${tag ? `<span class="tag">${tag}</span>` : ''}</div>
-      <div class="odesc">${desc} — <strong>${price}</strong></div>
-      <button class="btn" data-buy="${key}">${t('choose')} · ${price}</button>
+      <div class="offer-art">${art}</div>
+      <div class="offer-body">
+        <div class="otitle"><span class="otitle-l"><span class="medal sm">${icon}</span><span>${title}</span></span>${tag ? `<span class="tag">${tag}</span>` : ''}</div>
+        <div class="odesc">${desc} — <strong>${price}</strong></div>
+        <button class="btn" data-buy="${key}">${t('choose')} · ${price}</button>
+      </div>
     </div>`;
   ov.innerHTML = `
   <div class="sheet" role="dialog" aria-modal="true">
     <button class="iconbtn sheet-close" id="pwClose" aria-label="${t('close')}">${ICONS.close}</button>
     <h2>${t('paywallTitle')}</h2>
     <p style="color:var(--muted)">${t('paywallSub')}</p>
-    ${Object.keys(PACKS).map(p => card(ICONS[PACKS[p].icon], PACKS[p][lang], t('pack' + p[0].toUpperCase() + p.slice(1) + 'Desc'), PACKS[p].price, '', 'pack:' + p)).join('')}
-    ${card(ICONS.infinity, t('lifetime'), t('lifetimeDesc'), LIFETIME_PRICE, t('bestValue'), 'lifetime')}
+    ${Object.keys(PACKS).map(p => card(PACK_ART[p], ICONS[PACKS[p].icon], PACKS[p][lang], t('pack' + p[0].toUpperCase() + p.slice(1) + 'Desc'), PACKS[p].price, '', 'pack:' + p)).join('')}
+    ${card(PACK_ART.lifetime, ICONS.infinity, t('lifetime'), t('lifetimeDesc'), LIFETIME_PRICE, t('bestValue'), 'lifetime')}
     <button class="btn ghost" id="pwClose2" style="width:100%">${t('close')}</button>
     <!--
       TODO(STRIPE+COMPTES) — modèle « compte à l'achat », liens magiques, voir SPEC 3b.
@@ -487,6 +515,45 @@ if (location.hash.startsWith('#m=')) {
   const mix = decodeMix(location.hash);
   if (mix && Object.keys(mix).length) applyMix(mix);
 }
+
+// Vagues d'ambiance — réagissent au niveau audio réel.
+(function initAmbient() {
+  if (window.__wmAmbientInit || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  window.__wmAmbientInit = true;
+  const cv = document.getElementById('ambient');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  let W, H, t = 0, amp = 1;
+  const size = () => { W = cv.width = innerWidth; H = cv.height = innerHeight; };
+  size(); addEventListener('resize', size);
+  const dark = () => {
+    const th = document.documentElement.getAttribute('data-theme');
+    if (th) return th === 'dark';
+    return matchMedia('(prefers-color-scheme: dark)').matches;
+  };
+  const layers = [
+    { y: .30, a: 26, s: .006, sp: .012, c: [124, 195, 211] },
+    { y: .36, a: 36, s: .004, sp: -.009, c: [47, 125, 140] },
+  ];
+  (function draw() {
+    t += .016;
+    const lvl = engine.getLevel();
+    amp += ((1 + lvl * 3) - amp) * .06;
+    ctx.clearRect(0, 0, W, H);
+    const d = dark();
+    layers.forEach((L) => {
+      ctx.beginPath();
+      for (let x = 0; x <= W; x += 8) {
+        const y = H * L.y + Math.sin(x * L.s + t * L.sp * 60) * L.a * amp;
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+      ctx.fillStyle = `rgba(${L.c[0]},${L.c[1]},${L.c[2]},${d ? .055 : .10})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  })();
+})();
 
 // PWA : service worker (cache app shell + sons gratuits pour le hors-ligne).
 if ('serviceWorker' in navigator) {

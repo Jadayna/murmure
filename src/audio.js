@@ -35,7 +35,12 @@ export class AudioEngine {
       this.limiter.ratio.value = 20;
       this.limiter.attack.value = 0.003;
       this.limiter.release.value = 0.25;
-      this.master.connect(this.limiter);
+      // Analyseur pour les visuels réactifs (passe le son, ne le modifie pas).
+      this.analyser = this.ctx.createAnalyser();
+      this.analyser.fftSize = 64;
+      this.analyser.smoothingTimeConstant = 0.75;
+      this.master.connect(this.analyser);
+      this.analyser.connect(this.limiter);
       this.limiter.connect(this.ctx.destination);
     }
     if (this.ctx.state === 'suspended') {
@@ -96,6 +101,16 @@ export class AudioEngine {
   setVolume(id, volume01) {
     const v = this.voices.get(id);
     if (v) v.gain.gain.setTargetAtTime(volume01 * volume01 * (v.trimLin || 1), this.ctx.currentTime, 0.05);
+  }
+
+  // Niveau moyen 0..1 du mix (pour les visuels réactifs).
+  getLevel() {
+    if (!this.ctx || !this.analyser) return 0;
+    if (!this._freq) this._freq = new Uint8Array(this.analyser.frequencyBinCount);
+    this.analyser.getByteFrequencyData(this._freq);
+    let sum = 0;
+    for (let i = 0; i < this._freq.length; i++) sum += this._freq[i];
+    return sum / this._freq.length / 255;
   }
 
   activeVolumes() {

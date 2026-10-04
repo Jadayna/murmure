@@ -47,6 +47,7 @@ export const STRINGS = {
     playPause: 'Lecture / Pause',
     themeAuto: 'Auto', themeDark: 'Sombre', themeLight: 'Clair',
     devUnlocked: 'Débloqué (mode dev)',
+    nowPlaying: 'En ce moment',
   },
   en: {
     tagline: 'The simple, honest ambient sound mixer.',
@@ -95,6 +96,7 @@ export const STRINGS = {
     playPause: 'Play / Pause',
     themeAuto: 'Auto', themeDark: 'Dark', themeLight: 'Light',
     devUnlocked: 'Unlocked (dev mode)',
+    nowPlaying: 'Now playing',
   },
 };
 
