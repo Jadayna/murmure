@@ -71,4 +71,4 @@ export const PACKS = {
   tropical:{ fr: 'Pluie tropicale',en: 'Tropical rain',  price: '2,99 $', icon: 'palm' },
 };
 
-export const LIFETIME_PRICE = '9,99 $';
+export const LIFETIME_PRICE = '12,99 $';

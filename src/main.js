@@ -433,7 +433,7 @@ function openPaywall(highlight) {
       AUCUNE clé dans ce repo.
       1. Créer les 7 produits dans Stripe (compte Axe C Studio) : pack_orage,
          pack_boreale, pack_japon, pack_cote, pack_camp, pack_tropical (2,99 $),
-         lifetime (9,99 $) — paiements uniques, pas d'abonnement.
+         lifetime (12,99 $) — paiements uniques, pas d'abonnement.
       2. Backend : POST /api/stripe/checkout {key} → crée la Checkout Session,
          renvoie l'URL. Ici : fetch POST → window.location = sessionUrl.
       3. Webhook checkout.session.completed (signature vérifiée) → crée le compte
