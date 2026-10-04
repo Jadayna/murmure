@@ -429,16 +429,19 @@ function openPaywall(highlight) {
     ${card(ICONS.infinity, t('lifetime'), t('lifetimeDesc'), LIFETIME_PRICE, t('bestValue'), 'lifetime')}
     <button class="btn ghost" id="pwClose2" style="width:100%">${t('close')}</button>
     <!--
-      TODO(STRIPE) — intégration paiement (à faire, AUCUNE clé dans ce repo) :
-      1. Créer les 7 produits dans Stripe (compte Axe C Studio) : pack_orage 2,99 $,
-         pack_boreale 2,99 $, pack_japon 2,99 $, pack_cote 2,99 $, pack_camp 2,99 $,
-         pack_tropical 2,99 $, lifetime 9,99 $ (paiements uniques, pas d'abonnement).
-      2. Fonction serverless (ex. /api/stripe/checkout sur Vercel) : reçoit {key},
-         crée une Checkout Session Stripe, renvoie l'URL.
-      3. Ici : fetch POST → window.location = sessionUrl.
-      4. Webhook Stripe (fonction serverless) : sur checkout.session.completed,
-         marque le droit côté serveur ; le client débloque via /api/entitlements
-         puis saveEntitlements(). Pour l'instant tout est stubbé en local.
+      TODO(STRIPE+COMPTES) — modèle « compte à l'achat », liens magiques, voir SPEC 3b.
+      AUCUNE clé dans ce repo.
+      1. Créer les 7 produits dans Stripe (compte Axe C Studio) : pack_orage,
+         pack_boreale, pack_japon, pack_cote, pack_camp, pack_tropical (2,99 $),
+         lifetime (9,99 $) — paiements uniques, pas d'abonnement.
+      2. Backend : POST /api/stripe/checkout {key} → crée la Checkout Session,
+         renvoie l'URL. Ici : fetch POST → window.location = sessionUrl.
+      3. Webhook checkout.session.completed (signature vérifiée) → crée le compte
+         (email Stripe), attache le droit, envoie le lien magique via Resend.
+      4. GET /api/entitlements (session cookie) → droits serveur ; le client met en
+         cache local pour le hors-ligne. Login / récupération : POST /api/auth/link
+         {email} → lien magique 15 min, usage unique (rate limit 5/h).
+      Pour l'instant tout est stubbé en local (wm_entitlements).
     -->
   </div>`;
   ov.addEventListener('click', (e) => { if (e.target === ov) ov.remove(); });
